@@ -55,7 +55,7 @@
                                     double ietl_jcd_tol, double truncation_initial,
                                     double truncation_final, double integral_cutoff,
                                     const std::string& twosite_truncation, const std::string& orb_order,
-                                    bool ignore_h5_ = false);
+                                    bool ignore_h5_);
 
 
     // Initializes/updates integrals
