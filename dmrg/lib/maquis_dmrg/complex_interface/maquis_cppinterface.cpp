@@ -153,6 +153,12 @@ integral_indices[i][3]};
         cpp_parms.set("nmainsweeps", nmainsweeps_);
     }
 
+    void qcmaquis_interface_set_param(const char* key, const char* value)
+    {
+        cpp_parms.set(key, std::string(value));
+    }
+
+
     void qcmaquis_interface_report(const std::string& reportid_)
     {
         std::cout << " reporting parms for -> " << reportid_ << std::endl;
