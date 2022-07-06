@@ -73,6 +73,9 @@
     // Sets the number of sweeps
     void qcmaquis_interface_set_nsweeps(int nsweeps, int ngrowsweeps, int nmainsweeps);
 
+    // Set an arbitrary QCMaquis parameter
+    void qcmaquis_interface_set_param(const char* key, const char* value);
+
     void qcmaquis_interface_report(const std::string& reportid);
 
     // Start a new simulation with stored parameters
