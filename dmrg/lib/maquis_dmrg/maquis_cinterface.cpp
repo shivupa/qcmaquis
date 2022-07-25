@@ -29,6 +29,7 @@
 #include "maquis_cinterface.h"
 #include <memory>
 #include <string>
+#include <sstream>
 #include <array>
 #include <regex>
 #include "maquis_dmrg.h"
@@ -142,7 +143,7 @@ extern "C"
 
     }
 
-    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations)
+    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations, int* fiedler_order = nullptr)
     {
         // TODO: Make sure that qcmaquis_interface_preinit and _update_integrals has been called beforehand
 
@@ -176,6 +177,16 @@ extern "C"
             std::string str = starting_guess.getFiedlerOrder();
             assert(str.length() == len);
             strncpy(fiedler_order_string, str.c_str(), len);
+		if (fiedler_order != nullptr){
+                std::stringstream stream(str);
+		    std::string item;
+		    int i = 0;
+                while (std::getline(stream, item, ',')){
+               	  fiedler_order[i] = std::atoi(item.c_str());
+			  i+=1;
+		    }
+               	  //std::cout << std::atoi(item.c_str()) <<" " << std::endl;
+		}
         }
 
         if (do_cideas)

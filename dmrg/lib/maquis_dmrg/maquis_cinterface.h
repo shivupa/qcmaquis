@@ -72,7 +72,7 @@ extern "C"
     // if Fiedler ordering is present, return the ordering as a string (starting with 1) in fiedler_order_string (note that its length must be correct!)
     // hf_occupation: Array of HF occupations (as 4,3,2,1) for all states, as flattened row-major array of (L*nstates)
     // For CI-DEAS mandatory, for Fiedler ordering optional
-    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations);
+    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations, int* fiedler_order);
 
     // Set checkpoint names correctly for excited states
     void qcmaquis_interface_set_state(int state);
