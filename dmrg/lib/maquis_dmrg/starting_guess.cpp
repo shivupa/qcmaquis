@@ -160,9 +160,8 @@ namespace maquis
 
                 std::vector<Matrix> mutI;
 
-                // Calculate S1 only if CI-DEAS is requested and mutual information only if Fiedler ordering is requested
-                if (do_cideas)
-                    s1_.reserve(nstates_);
+                // Calculate S1 always and mutual information only if Fiedler ordering is requested
+                s1_.reserve(nstates_);
                 if (do_fiedler)
                     mutI.reserve(nstates_);
 
@@ -173,8 +172,7 @@ namespace maquis
                     EntanglementData<Matrix> em(get_measurements()[i]);
 
                     // store data
-                    if (do_cideas)
-                        s1_.emplace_back(std::move(em.s1()));
+                    s1_.emplace_back(std::move(em.s1()));
                     if (do_fiedler)
                         mutI.emplace_back(std::move(em.I()));
                 }
@@ -192,7 +190,15 @@ namespace maquis
                     SAmutI /= nstates;
                     SA_mutI_ = SAmutI;
                 }
-            }
+                // Calculate average single-orbital entropy
+                Matrix SAs1(s1_[0].num_rows(), s1_[0].num_cols(),0.0);
+                for (auto& n : s1_)
+                    SAs1 += n;
+
+                // Divide s1 information by the number of states
+                SAs1 /= nstates;
+                SA_s1_ = SAs1;
+		}
 
             ~Impl()
             {
@@ -205,13 +211,49 @@ namespace maquis
                 }
             }
 
-            // Get single-orbital entropy for state i
+            // return single-orbital entropy for state i or the state-averaged one (i=-1)
             const Matrix& SA_s1(int i) const
             {
-                if (do_cideas_)
+                if (i > 0)
                     return s1_[i];
                 else
-                    throw std::runtime_error("Please enable CI-DEAS to calculate S1");
+                    return SA_s1_;
+            }
+            //
+            // return single-orbital entropy for state i or the state-averaged one (i=-1)
+            // num_rows == 1!
+            std::vector<V> get_s1(int k) const
+            {
+                int L =0;
+		    if(k > 0)
+			L = s1_[k].num_cols();
+		    else
+			L = SA_s1_.num_cols();
+
+                std::vector<V> s1(L);
+                if (k > 0){
+                    for (int i = 0; i < s1_[k].num_rows(); i++)
+                       for (int j = 0; j < s1_[k].num_cols(); j++)
+			         s1[j] = s1_[k](i,j);
+		    }
+                else
+		    {
+                    for (int i = 0; i < SA_s1_.num_rows(); i++)
+                       for (int j = 0; j < SA_s1_.num_cols(); j++)
+			         s1[j] = SA_s1_(i,j);
+		    }
+                return s1;
+            }
+
+            // return mutual information as vector - state-averaged one
+            std::vector<V> get_mutI() const
+            {
+                std::vector<V> mutI(SA_mutI_.num_cols()*SA_mutI_.num_rows());
+   		    int nrow = SA_mutI_.num_rows();
+                for (int i = 0; i < SA_mutI_.num_rows(); i++)
+                    for (int j = 0; j < SA_mutI_.num_cols(); j++)
+		            mutI[nrow*(i)+j] = SA_mutI_(i,j);
+                return mutI;
             }
 
             // Get state-average mutual information
@@ -293,7 +335,9 @@ namespace maquis
 
             // Store single-orbital entropy and mutual information
             // Mutual information is state-average while single-orbital entropy is state-specific
+            // state-average single-orbital entropy is available as well
             Matrix SA_mutI_;
+            Matrix SA_s1_;
             std::vector<Matrix> s1_;
 
             // Calculate the Laplacian
@@ -343,6 +387,12 @@ namespace maquis
 
     template <class V>
     std::string StartingGuess<V>::getFiedlerOrder() { return impl_-> getFiedlerOrder(); }
+
+    template<class V> 
+    std::vector<V> StartingGuess<V>::get_s1(int k) { return impl_->get_s1(k); }
+
+    template<class V> 
+    std::vector<V> StartingGuess<V>::get_mutI() { return impl_->get_mutI(); }
 
     template<class V> void StartingGuess<V>::cideas() { impl_->cideas(); }
 

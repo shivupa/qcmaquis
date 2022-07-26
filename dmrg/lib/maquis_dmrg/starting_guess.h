@@ -51,6 +51,12 @@ namespace maquis
             // calculate Fiedler order
             std::string getFiedlerOrder();
 
+            // return s1 as vector
+            std::vector<V> get_s1(int i);
+
+            // return mutI as vector
+            std::vector<V> get_mutI();
+
             // Calculate and save MPS for CI-DEAS guess, as "pname.checkpoint_state.X.h5"
             // Currently we do not return the MPS but rather save them into files, which can be read later from disk
             void cideas();

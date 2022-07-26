@@ -143,7 +143,7 @@ extern "C"
 
     }
 
-    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations, int* fiedler_order = nullptr)
+    void qcmaquis_interface_run_starting_guess(int nstates, const char* project_name, bool do_fiedler, bool do_cideas, char* fiedler_order_string, int* hf_occupations, int* fiedler_order = nullptr, V* s1 = nullptr, V* mutI = nullptr)
     {
         // TODO: Make sure that qcmaquis_interface_preinit and _update_integrals has been called beforehand
 
@@ -177,6 +177,7 @@ extern "C"
             std::string str = starting_guess.getFiedlerOrder();
             assert(str.length() == len);
             strncpy(fiedler_order_string, str.c_str(), len);
+		// return Fiedler order if space for it is provided
 		if (fiedler_order != nullptr){
                 std::stringstream stream(str);
 		    std::string item;
@@ -186,6 +187,33 @@ extern "C"
 			  i+=1;
 		    }
                	  //std::cout << std::atoi(item.c_str()) <<" " << std::endl;
+		}
+		// return s1 if space for it is provided
+		if (s1 != nullptr){
+
+               int L = parms["L"];
+               for (int i = 0; i < L; i++)
+		       std::cout << " s1 init is for i = " << i << ": " << s1[i] << std::endl;
+
+		   std::vector<V> _s1 = starting_guess.get_s1(-1);
+		   std::cout << " now return to py..." << std::endl;
+               for (int i = 0; i < L; i++){
+			s1[i] = _s1[i];
+		      std::cout << " s1 now is for i = " << i << ": " << s1[i] << std::endl;
+		   }
+
+	      }
+		// return mutinf if space for it is provided
+		if (mutI != nullptr){
+		   std::vector<V> _mutI = starting_guess.get_mutI();
+               int L = parms["L"];
+               for (int i = 0; i < L*L; i++)
+		       std::cout << " mut init is for i = " << i << ": " << mutI[i] << std::endl;
+               for (int i = 0; i < L; i++)
+               	for (int j = 0; j < L; j++){
+				mutI[i*L + j] = _mutI[i*L + j];
+		            std::cout << " mutI is for i = " << i*L+j << ": " << mutI[i*L+j] << std::endl;
+		   }
 		}
         }
 
