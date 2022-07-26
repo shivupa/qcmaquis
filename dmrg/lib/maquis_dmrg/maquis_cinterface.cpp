@@ -192,28 +192,18 @@ extern "C"
 		if (s1 != nullptr){
 
                int L = parms["L"];
-               for (int i = 0; i < L; i++)
-		       std::cout << " s1 init is for i = " << i << ": " << s1[i] << std::endl;
-
 		   std::vector<V> _s1 = starting_guess.get_s1(-1);
-		   std::cout << " now return to py..." << std::endl;
-               for (int i = 0; i < L; i++){
+               for (int i = 0; i < L; i++)
 			s1[i] = _s1[i];
-		      std::cout << " s1 now is for i = " << i << ": " << s1[i] << std::endl;
-		   }
 
 	      }
 		// return mutinf if space for it is provided
 		if (mutI != nullptr){
 		   std::vector<V> _mutI = starting_guess.get_mutI();
                int L = parms["L"];
-               for (int i = 0; i < L*L; i++)
-		       std::cout << " mut init is for i = " << i << ": " << mutI[i] << std::endl;
                for (int i = 0; i < L; i++)
-               	for (int j = 0; j < L; j++){
+               	for (int j = 0; j < L; j++)
 				mutI[i*L + j] = _mutI[i*L + j];
-		            std::cout << " mutI is for i = " << i*L+j << ": " << mutI[i*L+j] << std::endl;
-		   }
 		}
         }
 
